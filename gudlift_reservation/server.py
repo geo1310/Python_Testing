@@ -1,16 +1,21 @@
 import json
+import os
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 
 
 def load_clubs():
-    with open("gudlift_reservation/data/clubs.json") as c:
+    current_dir = os.path.dirname(__file__)
+    clubs_file_path = os.path.join(current_dir, "data", "clubs.json")
+    with open(clubs_file_path) as c:
         list_of_clubs = json.load(c)["clubs"]
         return list_of_clubs
 
 
 def load_competitions():
-    with open("gudlift_reservation/data/competitions.json") as comps:
+    current_dir = os.path.dirname(__file__)
+    competitions_file_path = os.path.join(current_dir, "data", "competitions.json")
+    with open(competitions_file_path) as comps:
         list_of_competitions = json.load(comps)["competitions"]
         return list_of_competitions
 
