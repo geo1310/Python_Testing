@@ -2,14 +2,25 @@ from gudlift_reservation import app, server
 
 
 class TestServerRoutes:
+    """
+    Classe de tests pour tester les routes de l'application.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        """
+        Méthode de configuration de classe exécutée une seule fois avant tous les tests.
+        Charge les données des clubs et des compétitions.
+        """
+        cls.clubs = server.load_clubs()
+        cls.competitions = server.load_competitions()
+
     def setup_method(self):
         """
         Méthode de configuration exécutée avant chaque test.
         Initialise un client de test Flask et charge les données des clubs et des compétitions.
         """
         self.client = app.test_client()  # Initialisation du client de test Flask
-        self.clubs = server.load_clubs()
-        self.competitions = server.load_competitions()
 
     def test_ok_index_route(self):
         """
