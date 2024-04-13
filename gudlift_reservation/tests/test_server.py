@@ -1,3 +1,5 @@
+import pytest
+
 from gudlift_reservation import app, server
 
 
@@ -43,17 +45,24 @@ class TestServerRoutes:
         )
         assert rv.status_code == 200
 
-    def test_fail_show_summary_route(self):
+    @pytest.mark.parametrize(
+        "email, expected_value",
+        [
+            ("", "No email provided"),
+            ("test@email.fr", "Club with this email test@email.fr not found"),
+        ],
+    )
+    def test_fail_show_summary_route(self, email, expected_value):
         """
         Test de la route "/showSummary".
-        Envoie une requête POST avec une adresse e-mail non valide
-        Vérifie le code de statut de la réponse 400 et un message d'erreur.
+        Envoie une requête POST avec une adresse e-mail absente ou incorrecte
+        Vérifie la redirection vers index.html avec le code de statut 200 et un message d'erreur.
         """
         rv = self.client.post(
-            "/showSummary", data=dict(email="test@email.fr"), follow_redirects=True
+            "/showSummary", data=dict(email=email), follow_redirects=True
         )
-        assert rv.status_code == 400
-        assert b"Invalid email address" in rv.data
+        assert rv.status_code == 200
+        assert expected_value.encode("utf-8") in rv.data
 
     def test_ok_book_route(self):
         """
