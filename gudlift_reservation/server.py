@@ -3,6 +3,9 @@ import os
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 
+app = Flask(__name__)
+app.config.from_object("gudlift_reservation.config")
+
 
 def load_clubs():
     current_dir = os.path.dirname(__file__)
@@ -20,11 +23,9 @@ def load_competitions():
         return list_of_competitions
 
 
-app = Flask(__name__)
-app.config.from_object("gudlift_reservation.config")
-
 competitions = load_competitions()
 clubs = load_clubs()
+welcome_template = "welcome.html"
 
 
 @app.route("/")
@@ -34,8 +35,20 @@ def index():
 
 @app.route("/showSummary", methods=["POST"])
 def show_summary():
-    club = [club for club in clubs if club["email"] == request.form["email"]][0]
-    return render_template("welcome.html", club=club, competitions=competitions)
+
+    email = request.form["email"]
+
+    if not email:
+        flash("No email provided", "error")
+        return redirect(url_for("index"))
+
+    try:
+        club = next(club for club in clubs if club["email"] == email)
+    except StopIteration:
+        flash(f"Club with this email {email} not found", "error")
+        return redirect(url_for("index"))
+
+    return render_template(welcome_template, club=club, competitions=competitions)
 
 
 @app.route("/book/<competition>/<club>")
@@ -48,7 +61,7 @@ def book(competition, club):
         )
     else:
         flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template(welcome_template, club=club, competitions=competitions)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
@@ -60,7 +73,7 @@ def purchase_places():
     places_required = int(request.form["places"])
     competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - places_required
     flash("Great-booking complete!")
-    return render_template("welcome.html", club=club, competitions=competitions)
+    return render_template(welcome_template, club=club, competitions=competitions)
 
 
 # TODO: Add route for points display
