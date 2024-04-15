@@ -1,7 +1,8 @@
 import json
 import os
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import (Flask, abort, flash, redirect, render_template, request,
+                   url_for)
 
 app = Flask(__name__)
 app.config.from_object("gudlift_reservation.config")
@@ -53,15 +54,20 @@ def show_summary():
 
 @app.route("/book/<competition>/<club>")
 def book(competition, club):
-    found_club = [c for c in clubs if c["name"] == club][0]
-    found_competition = [c for c in competitions if c["name"] == competition][0]
-    if found_club and found_competition:
-        return render_template(
-            "booking.html", club=found_club, competition=found_competition
-        )
-    else:
-        flash("Something went wrong-please try again")
-        return render_template(welcome_template, club=club, competitions=competitions)
+
+    try:
+        found_club = next(c for c in clubs if c["name"] == club)
+    except StopIteration:
+        abort(400, "Invalid club")
+
+    try:
+        found_competition = next(c for c in competitions if c["name"] == competition)
+    except StopIteration:
+        abort(400, "Invalid competition")
+
+    return render_template(
+        "booking.html", club=found_club, competition=found_competition
+    )
 
 
 @app.route("/purchasePlaces", methods=["POST"])
