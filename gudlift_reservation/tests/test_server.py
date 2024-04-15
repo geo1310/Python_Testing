@@ -76,16 +76,38 @@ class TestServerRoutes:
         assert response.status_code == 200
         assert b"How many places" in response.data
 
-    def test_fail_book_route(self):
+    @pytest.mark.parametrize(
+        "club, competition, expected_value, status_code",
+        [
+            ("xxx", "Spring Festival", "Invalid club", 400),
+            (
+                "",
+                "Spring Festival",
+                "",
+                404,
+            ),
+            (
+                "She Lifts",
+                "xxx",
+                "Invalid competition",
+                400,
+            ),
+            (
+                "She Lifts",
+                "",
+                "",
+                404,
+            ),
+        ],
+    )
+    def test_fail_book_route(self, club, competition, expected_value, status_code):
         """
         Test de la route "/book/<competition>/<club>" avec des données non valides.
-        Vérifie le code de statut de la réponse 400 et un message d'erreur.
+        Vérifie le code de statut de la réponse 400 ou 404 et un message d'erreur.
         """
-        club = "xxx"
-        competition = "xxx"
         response = self.client.get(f"/book/{competition}/{club}")
-        assert response.status_code == 400
-        assert b"Donnees invalides " in response.data
+        assert response.status_code == status_code
+        expected_value.encode("utf-8") in response.data
 
     def test_ok_purchase_places_route(self):
         """

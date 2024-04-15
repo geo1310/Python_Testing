@@ -3,5 +3,6 @@ include
 lib
 .Python
 .envrc
+.coverage
 __pycache__
 env/
