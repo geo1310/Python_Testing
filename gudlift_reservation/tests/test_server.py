@@ -126,21 +126,70 @@ class TestServerRoutes:
         assert rv.status_code == 200
         assert b"Great-booking complete!" in rv.data
 
-    def test_fail_purchase_places_route(self):
+    @pytest.mark.parametrize(
+        "club, competition, places, expected_value, status_code",
+        [
+            ("xxx", "Spring Festival", "1", "Invalid club", 400),
+            (
+                "xxx",
+                "Spring Festival",
+                "1",
+                "Invalid club",
+                400,
+            ),
+            (
+                "She Lifts",
+                "xxx",
+                "1",
+                "Invalid competition",
+                400,
+            ),
+            (
+                "She Lifts",
+                "",
+                "1",
+                "",
+                400,
+            ),
+            (
+                "",
+                "Spring Festival",
+                "1",
+                "",
+                400,
+            ),
+            (
+                "She Lifts",
+                "Spring Festival",
+                "",
+                "Invalid number",
+                200,
+            ),
+            (
+                "She Lifts",
+                "Spring Festival",
+                "xxx",
+                "Invalid number",
+                200,
+            ),
+        ],
+    )
+    def test_fail_purchase_places_route(
+        self, club, competition, places, expected_value, status_code
+    ):
         """
         Test de la route "/purchasePlaces".
         Envoie une requête POST avec avec des données non valides
-        Vérifie le code de statut de la réponse 400 et un message d'erreur
+        Vérifie le code de statut de la réponse 400 ou 200 et un message d'erreur
         """
-        club = "xxx"
-        competition = "xxx"
-        places = "xxx"
+
         rv = self.client.post(
             "/purchasePlaces",
             data={"club": club, "competition": competition, "places": places},
+            follow_redirects=True,
         )
-        assert rv.status_code == 400
-        assert b"Donnees invalides" in rv.data
+        assert rv.status_code == status_code
+        assert expected_value.encode("utf-8") in rv.data
 
     def test_ok_logout_route(self):
         """
