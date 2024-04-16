@@ -31,5 +31,9 @@
             {% endif %}
         {% endwith %}
 
+        <form action="/showSummary" method="post">
+            <input type="hidden" name="email" value="{{club['email']}}">
+            <button type="submit">Return Summary</button>
+        </form>
     </body>
 </html>

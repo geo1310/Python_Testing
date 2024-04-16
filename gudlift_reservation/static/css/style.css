@@ -1,6 +1,9 @@
 body {
     margin-left: 20px;
 }
+button {
+    margin-top: 20px;
+}
 .flash-error {
     color: red;
     font-weight: 700;
