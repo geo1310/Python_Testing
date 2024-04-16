@@ -1,27 +1,11 @@
-import json
-import os
-
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+from .json_handler import (load_clubs, load_competitions, save_clubs,
+                           save_competitions)
+
 app = Flask(__name__)
 app.config.from_object("gudlift_reservation.config")
-
-
-def load_clubs():
-    current_dir = os.path.dirname(__file__)
-    clubs_file_path = os.path.join(current_dir, "data", "clubs.json")
-    with open(clubs_file_path) as c:
-        list_of_clubs = json.load(c)["clubs"]
-        return list_of_clubs
-
-
-def load_competitions():
-    current_dir = os.path.dirname(__file__)
-    competitions_file_path = os.path.join(current_dir, "data", "competitions.json")
-    with open(competitions_file_path) as comps:
-        list_of_competitions = json.load(comps)["competitions"]
-        return list_of_competitions
 
 
 competitions = load_competitions()
@@ -31,11 +15,18 @@ welcome_template = "welcome.html"
 
 @app.route("/")
 def index():
+    """
+    Affiche la page d'accueil
+    """
     return render_template("index.html")
 
 
 @app.route("/showSummary", methods=["POST"])
 def show_summary():
+    """
+    Affiche le résumé des informations pour un club donné.
+    Vérifie si l'email est présent et correspond à un club.
+    """
 
     email = request.form["email"]
 
@@ -54,6 +45,10 @@ def show_summary():
 
 @app.route("/book/<competition>/<club>")
 def book(competition, club):
+    """
+    Affiche la page de réservation pour une compétition et un club donné.
+    Vérifie si la compétition et le club sont valides.
+    """
 
     try:
         found_club = next(c for c in clubs if c["name"] == club)
@@ -72,6 +67,13 @@ def book(competition, club):
 
 @app.route("/purchasePlaces", methods=["POST"])
 def purchase_places():
+    """
+    Gère la réservation de places pour une compétition par un club donné.
+    Vérifie si la compétition et le club sont valides, puis vérifie si le club a suffisamment
+    de points pour acheter des places et si le nb de places demandées est positif.
+    Si le club a suffisamment de points, les places sont réservées et les points du club et les
+    places de la compétition sont mis à jour.
+    """
 
     try:
         competition = next(
@@ -86,6 +88,11 @@ def purchase_places():
 
     try:
         places_required = int(request.form["places"])
+        if places_required <= 0:
+            flash("Number of places required must be positive", "error")
+            return redirect(
+                url_for("book", competition=competition["name"], club=club["name"])
+            )
 
     except ValueError:
         flash("Invalid number", "error")
@@ -93,8 +100,21 @@ def purchase_places():
             url_for("book", competition=competition["name"], club=club["name"])
         )
 
-    competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - places_required
-    flash("Great-booking complete!")
+    if places_required <= club["points"]:
+
+        competition["numberOfPlaces"] -= places_required
+        club["points"] -= places_required
+
+        save_clubs(clubs)
+        save_competitions(competitions)
+
+        flash("Great-booking complete!")
+    else:
+        flash("insufficient number of points", "error")
+        return redirect(
+                url_for("book", competition=competition["name"], club=club["name"])
+            )
+
     return render_template(welcome_template, club=club, competitions=competitions)
 
 
@@ -103,4 +123,8 @@ def purchase_places():
 
 @app.route("/logout")
 def logout():
+    """
+    Déconnecte l'utilisateur et redirige vers la page d'accueil.
+    """
+
     return redirect(url_for("index"))

@@ -1,6 +1,6 @@
 import pytest
 
-from gudlift_reservation import app, server
+from . import setup_class, teardown_method
 
 
 class TestServerRoutes:
@@ -10,19 +10,10 @@ class TestServerRoutes:
 
     @classmethod
     def setup_class(cls):
-        """
-        Méthode de configuration de classe exécutée une seule fois avant tous les tests.
-        Charge les données des clubs et des compétitions.
-        """
-        cls.clubs = server.load_clubs()
-        cls.competitions = server.load_competitions()
+        setup_class(cls)
 
-    def setup_method(self):
-        """
-        Méthode de configuration exécutée avant chaque test.
-        Initialise un client de test Flask et charge les données des clubs et des compétitions.
-        """
-        self.client = app.test_client()  # Initialisation du client de test Flask
+    def teardown_method(self):
+        teardown_method(self)
 
     def test_ok_index_route(self):
         """
@@ -112,7 +103,7 @@ class TestServerRoutes:
     def test_ok_purchase_places_route(self):
         """
         Test de la route "/purchasePlaces".
-        Envoie une requête POST avec avec une competition, un club et un nb de places valides
+        Envoie une requête POST avec avec une competition et un club valides
         Vérifie le code de statut de la réponse 200
         et si le contenu de la réponse contient un message spécifique.
         """
@@ -121,7 +112,7 @@ class TestServerRoutes:
         places = 1
         rv = self.client.post(
             "/purchasePlaces",
-            data={"club": club, "competition": competition, "places": places},
+            data={"competition": competition, "club": club, "places": places},
         )
         assert rv.status_code == 200
         assert b"Great-booking complete!" in rv.data
@@ -129,39 +120,39 @@ class TestServerRoutes:
     @pytest.mark.parametrize(
         "club, competition, places, expected_value, status_code",
         [
-            ("xxx", "Spring Festival", "1", "Invalid club", 400),
+            ("xxx", "Spring Festival", 0, "Invalid club", 400),
             (
                 "xxx",
                 "Spring Festival",
-                "1",
+                1,
                 "Invalid club",
                 400,
             ),
             (
                 "She Lifts",
                 "xxx",
-                "1",
+                1,
                 "Invalid competition",
                 400,
             ),
             (
                 "She Lifts",
                 "",
-                "1",
+                1,
                 "",
                 400,
             ),
             (
                 "",
                 "Spring Festival",
-                "1",
+                1,
                 "",
                 400,
             ),
             (
                 "She Lifts",
                 "Spring Festival",
-                "",
+                "xxx",
                 "Invalid number",
                 200,
             ),
@@ -185,7 +176,7 @@ class TestServerRoutes:
 
         rv = self.client.post(
             "/purchasePlaces",
-            data={"club": club, "competition": competition, "places": places},
+            data={"competition": competition, "club": club, "places": places},
             follow_redirects=True,
         )
         assert rv.status_code == status_code
