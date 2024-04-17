@@ -10,10 +10,19 @@
     <body>
         <h2>{{competition['name']}}</h2>
         Places available: {{competition['numberOfPlaces']}}
+        {%if competition['reserved_places']%}
+            <ul>
+                {%for entry in competition['reserved_places']%}
+                    <li>Club : {{entry['club_name']}} - Reserved places : {{entry['reserved_places']}}
+                {%endfor%}
+            </ul>
+        {%endif%}
+        <hr />
         <div>
             <p>Your club : {{club['name']}}</p>
-            <p> You still have : {{club['points']}} points available.</p>
+            <p> You have : {{club['points']}} points available.</p>
         </div>
+
         <form action="/purchasePlaces" method="post">
             <input type="hidden" name="club" value="{{club['name']}}">
             <input type="hidden" name="competition" value="{{competition['name']}}">

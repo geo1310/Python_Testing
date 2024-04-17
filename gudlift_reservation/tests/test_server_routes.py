@@ -32,7 +32,7 @@ class TestServerRoutes:
         et vérifie le code de statut de la réponse 200.
         """
         rv = self.client.post(
-            "/showSummary", data=dict(email="john@simplylift.co"), follow_redirects=True
+            "/showSummary", data=dict(email="club_test@email.fr"), follow_redirects=True
         )
         assert rv.status_code == 200
 
@@ -40,7 +40,7 @@ class TestServerRoutes:
         "email, expected_value",
         [
             ("", "No email provided"),
-            ("test@email.fr", "Club with this email test@email.fr not found"),
+            ("fail_test@email.fr", "Club with this email fail_test@email.fr not found"),
         ],
     )
     def test_fail_show_summary_route(self, email, expected_value):
@@ -61,8 +61,8 @@ class TestServerRoutes:
         Vérifie le code de statut de la réponse 200
         et si le contenu de la réponse contient un message spécifique.
         """
-        club = "She Lifts"
-        competition = "Spring Festival"
+        club = "Club_test"
+        competition = "Competition_test"
         response = self.client.get(f"/book/{competition}/{club}")
         assert response.status_code == 200
         assert b"How many places" in response.data
@@ -70,21 +70,21 @@ class TestServerRoutes:
     @pytest.mark.parametrize(
         "club, competition, expected_value, status_code",
         [
-            ("xxx", "Spring Festival", "Invalid club", 400),
+            ("xxx", "Competition_test", "Invalid club", 400),
             (
                 "",
-                "Spring Festival",
+                "Competition_test",
                 "",
                 404,
             ),
             (
-                "She Lifts",
+                "Club_test",
                 "xxx",
                 "Invalid competition",
                 400,
             ),
             (
-                "She Lifts",
+                "Club_test",
                 "",
                 "",
                 404,
@@ -107,8 +107,8 @@ class TestServerRoutes:
         Vérifie le code de statut de la réponse 200
         et si le contenu de la réponse contient un message spécifique.
         """
-        club = "She Lifts"
-        competition = "Spring Festival"
+        club = "Club_test"
+        competition = "Competition_test"
         places = 1
         rv = self.client.post(
             "/purchasePlaces",
@@ -120,23 +120,22 @@ class TestServerRoutes:
     @pytest.mark.parametrize(
         "club, competition, places, expected_value, status_code",
         [
-            ("xxx", "Spring Festival", 0, "Invalid club", 400),
             (
                 "xxx",
-                "Spring Festival",
+                "Competition_test",
                 1,
                 "Invalid club",
                 400,
             ),
             (
-                "She Lifts",
+                "Club_test",
                 "xxx",
                 1,
                 "Invalid competition",
                 400,
             ),
             (
-                "She Lifts",
+                "Club_test",
                 "",
                 1,
                 "",
@@ -144,21 +143,21 @@ class TestServerRoutes:
             ),
             (
                 "",
-                "Spring Festival",
+                "Competition_test",
                 1,
                 "",
                 400,
             ),
             (
-                "She Lifts",
-                "Spring Festival",
-                "xxx",
+                "Club_test",
+                "Competition_test",
+                "",
                 "Invalid number",
                 200,
             ),
             (
-                "She Lifts",
-                "Spring Festival",
+                "Club_test",
+                "Competition_test",
                 "xxx",
                 "Invalid number",
                 200,
