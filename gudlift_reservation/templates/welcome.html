@@ -24,15 +24,24 @@
         <h3>Competitions:</h3>
         <ul>
             {% for comp in competitions%}
-                <li>
-                    {{comp['name']}}<br />
-                    Date: {{comp['date']}}</br>
-                    Number of Places: {{comp['numberOfPlaces']}}
-                    {%if comp['numberOfPlaces'] >0 and club['points'] >0%}
-                        <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-                    {%endif%}
-                </li>
-                <hr />
+                {%if not comp['name'] == 'Competition_test'%}
+                    <li>
+                        {{comp['name']}}<br />
+                        Date: {{comp['date']}}</br>
+                        Number of Places: {{comp['numberOfPlaces']}}
+                        {%if comp['numberOfPlaces'] >0 and club['points'] >0%}
+                            <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
+                        {%endif%}
+                        {%if comp['reserved_places']%}
+                            <ul>
+                                {%for entry in comp['reserved_places']%}
+                                    <li>Club : {{entry['club_name']}} - Reserved places : {{entry['reserved_places']}}
+                                {%endfor%}
+                            </ul>
+                        {%endif%}
+                    </li>
+                    <hr />
+                {%endif%}
             {% endfor %}
         </ul>
     </body>

@@ -93,6 +93,11 @@ def purchase_places():
             return redirect(
                 url_for("book", competition=competition["name"], club=club["name"])
             )
+        elif places_required > 12:
+            flash("use no more than 12 places per competition", "error")
+            return redirect(
+                url_for("book", competition=competition["name"], club=club["name"])
+            )
 
     except ValueError:
         flash("Invalid number", "error")
@@ -101,6 +106,31 @@ def purchase_places():
         )
 
     if places_required <= club["points"]:
+
+        reserved_places_entry = {
+            "club_name": club["name"],
+            "reserved_places": places_required,
+        }
+
+        if not competition["reserved_places"]:
+            competition["reserved_places"].append(reserved_places_entry)
+        else:
+            for entry in competition["reserved_places"]:
+
+                if entry["club_name"] == club["name"]:
+                    if entry["reserved_places"] + places_required > 12:
+                        flash("use no more than 12 places per competition", "error")
+                        return redirect(
+                            url_for(
+                                "book",
+                                competition=competition["name"],
+                                club=club["name"],
+                            )
+                        )
+                    entry["reserved_places"] += places_required
+                    break
+            else:
+                competition["reserved_places"].append(reserved_places_entry)
 
         competition["numberOfPlaces"] -= places_required
         club["points"] -= places_required
@@ -112,8 +142,8 @@ def purchase_places():
     else:
         flash("insufficient number of points", "error")
         return redirect(
-                url_for("book", competition=competition["name"], club=club["name"])
-            )
+            url_for("book", competition=competition["name"], club=club["name"])
+        )
 
     return render_template(welcome_template, club=club, competitions=competitions)
 

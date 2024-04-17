@@ -3,12 +3,20 @@
         {
             "name": "Spring Festival",
             "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": 25
+            "numberOfPlaces": 25,
+            "reserved_places": []
         },
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": 13
+            "numberOfPlaces": 13,
+            "reserved_places": []
+        },
+        {
+            "name": "Competition_test",
+            "date": "2020-10-22 13:30:00",
+            "numberOfPlaces": 15,
+            "reserved_places": []
         }
     ]
 }
