@@ -1,6 +1,8 @@
 import pytest
 
-from . import setup_class, teardown_method
+from gudlift_reservation import app
+from gudlift_reservation.json_handler import (load_clubs, load_competitions,
+                                              save_clubs, save_competitions)
 
 
 class TestServerRoutes:
@@ -10,10 +12,25 @@ class TestServerRoutes:
 
     @classmethod
     def setup_class(cls):
-        setup_class(cls)
+        """
+        Méthode de configuration de classe exécutée une seule fois avant tous les tests.
+        Initialise un client de test Flask
+        Charge les données des clubs et des compétitions.
+        Cree des sauvegardes de clubs.json et competitions.json
+        """
+        cls.client = app.test_client()
+        cls.clubs = load_clubs()
+        cls.competitions = load_competitions()
+        cls.clubs_save = load_clubs()
+        cls.competitions_save = load_competitions()
 
     def teardown_method(self):
-        teardown_method(self)
+        """
+        Méthode de configuration executée a la fin des tests
+        Rétablit les fichiers json d'origine.
+        """
+        save_clubs(self.clubs_save)
+        save_competitions(self.competitions_save)
 
     def test_ok_index_route(self):
         """

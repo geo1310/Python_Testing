@@ -3,6 +3,7 @@ from flask import (Flask, abort, flash, redirect, render_template, request,
 
 from .json_handler import (load_clubs, load_competitions, save_clubs,
                            save_competitions)
+from .utils import verif_date_in_past
 
 app = Flask(__name__)
 app.config.from_object("gudlift_reservation.config")
@@ -60,6 +61,13 @@ def book(competition, club):
     except StopIteration:
         abort(400, "Invalid competition")
 
+    # Vérifie si la date de la compétition est déjà passée
+    if verif_date_in_past(found_competition["date"]):
+        flash("Competition date has already passed", "error")
+        return render_template(
+            welcome_template, club=found_club, competitions=competitions
+        )
+
     return render_template(
         "booking.html", club=found_club, competition=found_competition
     )
@@ -85,6 +93,13 @@ def purchase_places():
         club = next(c for c in clubs if c["name"] == request.form["club"])
     except StopIteration:
         abort(400, "Invalid club")
+
+    # Vérifie si la date de la compétition est déjà passée
+    if verif_date_in_past(competition["date"]):
+        flash("Competition date has already passed", "error")
+        return redirect(
+            url_for("book", competition=competition["name"], club=club["name"])
+        )
 
     try:
         places_required = int(request.form["places"])
