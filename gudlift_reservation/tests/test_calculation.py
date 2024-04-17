@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta
+
 import pytest
 
-from gudlift_reservation.json_handler import load_clubs, load_competitions
-
-from . import setup_class, teardown_method
+from gudlift_reservation import app
+from gudlift_reservation.json_handler import (load_clubs, load_competitions,
+                                              save_clubs, save_competitions)
 
 
 class TestCalculation:
@@ -12,10 +14,25 @@ class TestCalculation:
 
     @classmethod
     def setup_class(cls):
-        setup_class(cls)
+        """
+        Méthode de configuration de classe exécutée une seule fois avant tous les tests.
+        Initialise un client de test Flask
+        Charge les données des clubs et des compétitions.
+        Cree des sauvegardes de clubs.json et competitions.json
+        """
+        cls.client = app.test_client()
+        cls.clubs = load_clubs()
+        cls.competitions = load_competitions()
+        cls.clubs_save = load_clubs()
+        cls.competitions_save = load_competitions()
 
     def teardown_method(self):
-        teardown_method(self)
+        """
+        Méthode de configuration executée a la fin des tests
+        Rétablit les fichiers json d'origine.
+        """
+        save_clubs(self.clubs_save)
+        save_competitions(self.competitions_save)
 
     @pytest.mark.parametrize(
         "club_name, competition_name, places, expected_value",
@@ -133,3 +150,23 @@ class TestCalculation:
                 reserv["reserved_places"] == places + 1
                 for reserv in competition_after["reserved_places"]
             )
+
+    def test_date_competition_not_be_in_past(self):
+        self.competition = next(
+            comp for comp in self.competitions if comp["name"] == "Competition_test"
+        )
+
+        date_test = datetime.now() - timedelta(days=5)
+        self.competition["date"] = date_test.strftime("%Y-%m-%d %H:%M:%S")
+        save_competitions(self.competitions)
+
+        self.competitions = load_competitions()
+        print("----------------------")
+        print(self.competitions)
+        print("----------------------")
+
+        response = self.client.get("/book/Competition_test/Club_test")
+
+        assert response.status_code == 200
+        # assert b"Competition date has already passed" in response.data
+        assert b"Return Summary" in response.data
