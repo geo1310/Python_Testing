@@ -1,14 +1,20 @@
-from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask import (Flask, abort, flash, redirect, render_template, request,
+                   url_for)
 
-from .json_handler import load_clubs, load_competitions, save_clubs, save_competitions
+from .json_handler import (load_clubs, load_competitions, save_clubs,
+                           save_competitions)
 from .utils import verif_date_in_past
 
 app = Flask(__name__)
 app.config.from_object("gudlift_reservation.config")
 
 
-competitions = load_competitions()
-clubs = load_clubs()
+def load_data():
+    competitions = load_competitions()
+    clubs = load_clubs()
+    return clubs, competitions
+
+
 welcome_template = "welcome.html"
 
 
@@ -26,6 +32,7 @@ def show_summary():
     Affiche le résumé des informations pour un club donné.
     Vérifie si l'email est présent et correspond à un club.
     """
+    clubs, competitions = load_data()
 
     email = request.form["email"]
 
@@ -48,6 +55,7 @@ def book(competition, club):
     Affiche la page de réservation pour une compétition et un club donné.
     Vérifie si la compétition et le club sont valides.
     """
+    clubs, competitions = load_data()
 
     try:
         found_club = next(c for c in clubs if c["name"] == club)
@@ -80,6 +88,7 @@ def purchase_places():
     Si le club a suffisamment de points, les places sont réservées et les points du club et les
     places de la compétition sont mis à jour.
     """
+    clubs, competitions = load_data()
 
     try:
         competition = next(

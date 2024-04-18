@@ -14,7 +14,7 @@ def load_data(file_name):
     """
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "data", file_name)
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -28,7 +28,7 @@ def save_data(data, file_name):
     """
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "data", file_name)
-    with open(file_path, "w", encoding='utf-8') as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f)
 
 

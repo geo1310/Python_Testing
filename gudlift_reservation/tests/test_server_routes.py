@@ -33,7 +33,7 @@ class TestServerRoutes:
         self.competitions = self.competitions_save
         save_clubs(self.clubs_save)
         save_competitions(self.competitions_save)
-        
+
     def test_ok_index_route(self):
         """
         Test de la route "/".

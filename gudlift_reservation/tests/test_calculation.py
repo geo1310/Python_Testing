@@ -3,12 +3,8 @@ from datetime import datetime, timedelta
 import pytest
 
 from gudlift_reservation import app
-from gudlift_reservation.json_handler import (
-    load_clubs,
-    load_competitions,
-    save_clubs,
-    save_competitions,
-)
+from gudlift_reservation.json_handler import (load_clubs, load_competitions,
+                                              save_clubs, save_competitions)
 
 
 class TestCalculation:
@@ -44,7 +40,7 @@ class TestCalculation:
         "club_name, competition_name, places, expected_value",
         [
             ("Club_test", "Competition_test", 10, "Great-booking complete!"),
-            ("Club_test", "Competition_test_2", 6, "insufficient number of points"),
+            ("Club_test_2", "Competition_test_2", 11, "insufficient number of points"),
             (
                 "Club_test",
                 "Competition_test",
@@ -133,22 +129,10 @@ class TestCalculation:
             follow_redirects=True,
         )
 
-        competition_after = next(
-            comp for comp in self.competitions if comp["name"] == competition_name
-        )
-
         assert rv.status_code == 200
         assert expected_value.encode("utf-8") in rv.data
 
-        if expected_value.encode("utf-8") not in rv.data:
-            assert any(
-                reserv["club_name"] == club_name
-                for reserv in competition_after["reserved_places"]
-            )
-            assert any(
-                reserv["reserved_places"] == places + 1
-                for reserv in competition_after["reserved_places"]
-            )
+        # TODO ajouter verif dans reserved_places
 
     def test_date_competition_not_be_in_past(self):
         """
@@ -164,22 +148,16 @@ class TestCalculation:
 
         self.competitions = load_competitions()
 
-        print('----------------------------')
-        print(self.competitions)
-        print('----------------------------')
-
         response = self.client.get("/book/Competition_test/Club_test")
 
         assert response.status_code == 200
         assert b"Competition date has already passed" in response.data
-        # assert b"Return Summary" in response.data
 
     @pytest.mark.parametrize(
         "club_name, competition_name, places, expected_value",
         [
-            ("Club_test", "Competition_test", 12, ""),
             (
-                "Club_test_2",
+                "Club_test",
                 "Competition_test",
                 12,
                 "insufficient places in the competition",
