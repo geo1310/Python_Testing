@@ -29,6 +29,8 @@ class TestServerRoutes:
         Méthode de configuration executée a la fin des tests
         Rétablit les fichiers json d'origine.
         """
+        self.clubs = self.clubs_save
+        self.competitions = self.competitions_save
         save_clubs(self.clubs_save)
         save_competitions(self.competitions_save)
 

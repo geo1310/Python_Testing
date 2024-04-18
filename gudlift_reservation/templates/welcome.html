@@ -24,7 +24,7 @@
         <h3>Competitions:</h3>
         <ul>
             {% for comp in competitions%}
-                {%if not comp['name'] == 'Competition_test'%}
+                {% if 'test' not in comp['name'] %}
                     <li>
                         {{comp['name']}}<br />
                         Date: {{comp['date']}}</br>
