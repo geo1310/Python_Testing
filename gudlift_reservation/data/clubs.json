@@ -18,7 +18,12 @@
         {
             "name": "Club_test",
             "email": "club_test@email.fr",
-            "points": 20
+            "points": 15
+        },
+        {
+            "name": "Club_test_2",
+            "email": "club_test@email.fr",
+            "points": 15
         }
     ]
 }

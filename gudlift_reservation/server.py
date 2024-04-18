@@ -1,8 +1,6 @@
-from flask import (Flask, abort, flash, redirect, render_template, request,
-                   url_for)
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
-from .json_handler import (load_clubs, load_competitions, save_clubs,
-                           save_competitions)
+from .json_handler import load_clubs, load_competitions, save_clubs, save_competitions
 from .utils import verif_date_in_past
 
 app = Flask(__name__)
@@ -110,6 +108,11 @@ def purchase_places():
             )
         elif places_required > 12:
             flash("use no more than 12 places per competition", "error")
+            return redirect(
+                url_for("book", competition=competition["name"], club=club["name"])
+            )
+        elif places_required > competition["numberOfPlaces"]:
+            flash("insufficient places in the competition", "error")
             return redirect(
                 url_for("book", competition=competition["name"], club=club["name"])
             )

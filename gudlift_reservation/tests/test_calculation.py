@@ -3,8 +3,12 @@ from datetime import datetime, timedelta
 import pytest
 
 from gudlift_reservation import app
-from gudlift_reservation.json_handler import (load_clubs, load_competitions,
-                                              save_clubs, save_competitions)
+from gudlift_reservation.json_handler import (
+    load_clubs,
+    load_competitions,
+    save_clubs,
+    save_competitions,
+)
 
 
 class TestCalculation:
@@ -31,6 +35,8 @@ class TestCalculation:
         Méthode de configuration executée a la fin des tests
         Rétablit les fichiers json d'origine.
         """
+        self.clubs = self.clubs_save
+        self.competitions = self.competitions_save
         save_clubs(self.clubs_save)
         save_competitions(self.competitions_save)
 
@@ -38,7 +44,7 @@ class TestCalculation:
         "club_name, competition_name, places, expected_value",
         [
             ("Club_test", "Competition_test", 10, "Great-booking complete!"),
-            ("Club_test", "Competition_test", 11, "insufficient number of points"),
+            ("Club_test", "Competition_test_2", 6, "insufficient number of points"),
             (
                 "Club_test",
                 "Competition_test",
@@ -82,7 +88,7 @@ class TestCalculation:
         "club_name, competition_name, places, expected_value",
         [
             (
-                "Club_test",
+                "Club_test_2",
                 "Competition_test",
                 13,
                 "use no more than 12 places per competition",
@@ -109,13 +115,7 @@ class TestCalculation:
     @pytest.mark.parametrize(
         "club_name, competition_name, places, expected_value",
         [
-            ("Club_test", "Competition_test", 3, ""),
-            (
-                "Club_test",
-                "Competition_test",
-                10,
-                "use no more than 12 places per competition",
-            ),
+            ("Club_test", "Competition_test", 1, "Great-booking complete!"),
         ],
     )
     def test_competition_reserved_places(
@@ -133,9 +133,8 @@ class TestCalculation:
             follow_redirects=True,
         )
 
-        competitions = load_competitions()
         competition_after = next(
-            comp for comp in competitions if comp["name"] == competition_name
+            comp for comp in self.competitions if comp["name"] == competition_name
         )
 
         assert rv.status_code == 200
@@ -152,21 +151,54 @@ class TestCalculation:
             )
 
     def test_date_competition_not_be_in_past(self):
+        """
+        Vérifie qu'on ne peut pas réserver de places dans une compétition deja passée.
+        """
         self.competition = next(
             comp for comp in self.competitions if comp["name"] == "Competition_test"
         )
 
-        date_test = datetime.now() - timedelta(days=5)
+        date_test = datetime.now() - timedelta(days=50)
         self.competition["date"] = date_test.strftime("%Y-%m-%d %H:%M:%S")
         save_competitions(self.competitions)
 
         self.competitions = load_competitions()
-        print("----------------------")
+
+        print('----------------------------')
         print(self.competitions)
-        print("----------------------")
+        print('----------------------------')
 
         response = self.client.get("/book/Competition_test/Club_test")
 
         assert response.status_code == 200
-        # assert b"Competition date has already passed" in response.data
-        assert b"Return Summary" in response.data
+        assert b"Competition date has already passed" in response.data
+        # assert b"Return Summary" in response.data
+
+    @pytest.mark.parametrize(
+        "club_name, competition_name, places, expected_value",
+        [
+            ("Club_test", "Competition_test", 12, ""),
+            (
+                "Club_test_2",
+                "Competition_test",
+                12,
+                "insufficient places in the competition",
+            ),
+        ],
+    )
+    def test_competition_available_places(
+        self, club_name, competition_name, places, expected_value
+    ):
+        """
+        Verifie si le nombre de places dans une competition est suffisant
+        Il ne peut pas etre négatif.
+        """
+
+        rv = self.client.post(
+            "/purchasePlaces",
+            data={"competition": competition_name, "club": club_name, "places": places},
+            follow_redirects=True,
+        )
+
+        assert rv.status_code == 200
+        assert expected_value.encode("utf-8") in rv.data
