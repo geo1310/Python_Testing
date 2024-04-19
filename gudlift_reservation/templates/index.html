@@ -5,27 +5,27 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icn/favicon.ico') }}">
-        <title>GUDLFT Registration</title>
+        <title>GUDLFT</title>
     </head>
     <body>
-        <h1>Welcome to the GUDLFT Registration Portal!</h1>
+        <h1>Welcome to the GUDLFT Home page !</h1>
 
-        Please enter your secretary email to continue:
-        <form action="showSummary" method="post">
-            <label for="email">Email:</label>
-            <input type="email" name="email" id=""/>
-            <button type="submit">Enter</button>
-        </form>
+        <h3>Liste des Clubs:</h3>
+        <ul>
+            {% for club in clubs%}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                <li>
+                    {{club['name']}}<br />
+                    Email: {{club['email']}}</br>
+                    Number of Points: {{club['points']}}
+                </li>
+                <hr />
+
+            {% endfor %}
+        </ul>
+
+
+        <a href="/login"><button>Sign in</button></a>
 
     </body>
 </html>

@@ -1,1 +1,2 @@
 SECRET_KEY = "something_special"
+SEND_FILE_MAX_AGE_DEFAULT = 3600
