@@ -2,39 +2,19 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from gudlift_reservation import app
-from gudlift_reservation.json_handler import (load_clubs, load_competitions,
-                                              save_clubs, save_competitions)
+from . import TestSetup
+
+from gudlift_reservation.json_handler import (
+    load_clubs,
+    load_competitions,
+    save_competitions,
+)
 
 
-class TestCalculation:
+class TestCalculation(TestSetup):
     """
     Classe de tests pour tester les calculs de l'application.
     """
-
-    @classmethod
-    def setup_class(cls):
-        """
-        Méthode de configuration de classe exécutée une seule fois avant tous les tests.
-        Initialise un client de test Flask
-        Charge les données des clubs et des compétitions.
-        Cree des sauvegardes de clubs.json et competitions.json
-        """
-        cls.client = app.test_client()
-        cls.clubs = load_clubs()
-        cls.competitions = load_competitions()
-        cls.clubs_save = load_clubs()
-        cls.competitions_save = load_competitions()
-
-    def teardown_method(self):
-        """
-        Méthode de configuration executée a la fin des tests
-        Rétablit les fichiers json d'origine.
-        """
-        self.clubs = self.clubs_save
-        self.competitions = self.competitions_save
-        save_clubs(self.clubs_save)
-        save_competitions(self.competitions_save)
 
     @pytest.mark.parametrize(
         "club_name, competition_name, places, expected_value",
