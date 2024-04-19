@@ -18,12 +18,12 @@ def load_data():
 welcome_template = "welcome.html"
 
 
-@app.route("/")
-def index():
+@app.route("/login")
+def login():
     """
-    Affiche la page d'accueil
+    Affiche la page de login
     """
-    return render_template("index.html")
+    return render_template("login.html")
 
 
 @app.route("/showSummary", methods=["POST"])
@@ -38,13 +38,13 @@ def show_summary():
 
     if not email:
         flash("No email provided", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
     try:
         club = next(club for club in clubs if club["email"] == email)
     except StopIteration:
         flash(f"Club with this email {email} not found", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
     return render_template(welcome_template, club=club, competitions=competitions)
 
@@ -184,4 +184,4 @@ def logout():
     Déconnecte l'utilisateur et redirige vers la page d'accueil.
     """
 
-    return redirect(url_for("index"))
+    return redirect(url_for("login"))

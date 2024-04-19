@@ -8,15 +8,15 @@ class TestServerRoutes(TestSetup):
     Classe de tests pour tester les routes de l'application.
     """
 
-    def test_index_route(self):
+    def test_login_route(self):
         """
-        Test de la route "/".
+        Test de la route "/login".
         Vérifie le code de statut de la réponse 200
         et si le contenu de la réponse contient le message de connexion.
         """
-        response = self.client.get("/")
+        response = self.client.get("/login")
         assert response.status_code == 200
-        assert b"Please enter your secretary email to continue" in response.data
+        assert b"Welcome to the GUDLFT Registration Portal!" in response.data
 
     @pytest.mark.parametrize(
         "email, expected_value",
