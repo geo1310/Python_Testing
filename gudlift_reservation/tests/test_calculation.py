@@ -2,13 +2,10 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from . import TestSetup
+from gudlift_reservation.json_handler import (load_clubs, load_competitions,
+                                              save_competitions)
 
-from gudlift_reservation.json_handler import (
-    load_clubs,
-    load_competitions,
-    save_competitions,
-)
+from . import TestSetup
 
 
 class TestCalculation(TestSetup):

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icn/favicon.ico') }}">
+        <title>GUDLFT</title>
+    </head>
+    <body>
+        <h1>Welcome to the GUDLFT Home page !</h1>
+
+        <h3>Liste des Clubs:</h3>
+        <ul>
+            {% for club in clubs%}
+
+                <li>
+                    {{club['name']}}<br />
+                    Email: {{club['email']}}</br>
+                    Number of Points: {{club['points']}}
+                </li>
+                <hr />
+
+            {% endfor %}
+        </ul>
+
+
+        <a href="/login"><button>Sign in</button></a>
+
+    </body>
+</html>

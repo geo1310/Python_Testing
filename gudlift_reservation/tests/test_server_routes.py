@@ -8,6 +8,16 @@ class TestServerRoutes(TestSetup):
     Classe de tests pour tester les routes de l'application.
     """
 
+    def test_index_route(self):
+        """
+        Test de la route index "/".
+        Vérifie le code de statut de la réponse 200
+        et si le contenu de la réponse contient le message d'accueil.
+        """
+        response = self.client.get("/")
+        assert response.status_code == 200
+        assert b"Welcome to the GUDLFT Home page !" in response.data
+
     def test_login_route(self):
         """
         Test de la route "/login".
@@ -23,7 +33,10 @@ class TestServerRoutes(TestSetup):
         [
             ("club_test@email.fr", "Welcome, club_test@email.fr "),  # données valides
             ("", "No email provided"),  # absence d'email
-            ("fail_test@email.fr", "Club with this email fail_test@email.fr not found"),  # email non valide
+            (
+                "fail_test@email.fr",
+                "Club with this email fail_test@email.fr not found",
+            ),  # email non valide
         ],
     )
     def test_show_summary_route(self, email, expected_value):
@@ -42,7 +55,12 @@ class TestServerRoutes(TestSetup):
     @pytest.mark.parametrize(
         "club, competition, expected_value, status_code",
         [
-            ("Club_test", "Competition_test", "How many places", 200),  # données valides
+            (
+                "Club_test",
+                "Competition_test",
+                "How many places",
+                200,
+            ),  # données valides
             ("xxx", "Competition_test", "Invalid club", 400),  # club non valide
             (  # absence de club
                 "",

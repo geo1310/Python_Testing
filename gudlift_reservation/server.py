@@ -18,6 +18,16 @@ def load_data():
 welcome_template = "welcome.html"
 
 
+@app.route("/")
+def index():
+    """
+    Affiche la page d'accueil
+    """
+    clubs, _ = load_data()
+
+    return render_template("index.html", clubs=clubs)
+
+
 @app.route("/login")
 def login():
     """
@@ -173,9 +183,6 @@ def purchase_places():
         )
 
     return render_template(welcome_template, club=club, competitions=competitions)
-
-
-# TODO: Add route for points display
 
 
 @app.route("/logout")
