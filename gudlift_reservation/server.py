@@ -21,7 +21,7 @@ welcome_template = "welcome.html"
 @app.route("/")
 def index():
     """
-    Affiche la page d'accueil
+    Vue pour la page d'accueil
     """
     clubs, _ = load_data()
 
@@ -31,7 +31,7 @@ def index():
 @app.route("/login")
 def login():
     """
-    Affiche la page de login
+    Vue pour la page de login
     """
     return render_template("login.html")
 
@@ -39,7 +39,7 @@ def login():
 @app.route("/showSummary", methods=["POST"])
 def show_summary():
     """
-    Affiche le résumé des informations pour un club donné.
+    Vue pour la page welcome
     Vérifie si l'email est présent et correspond à un club.
     """
     clubs, competitions = load_data()
@@ -62,8 +62,9 @@ def show_summary():
 @app.route("/book/<competition>/<club>")
 def book(competition, club):
     """
-    Affiche la page de réservation pour une compétition et un club donné.
+    Vue pour la page de réservation pour une compétition et un club donné.
     Vérifie si la compétition et le club sont valides.
+    Verifie si la date de competition n'est pas deja passée
     """
     clubs, competitions = load_data()
 
@@ -92,11 +93,12 @@ def book(competition, club):
 @app.route("/purchasePlaces", methods=["POST"])
 def purchase_places():
     """
-    Gère la réservation de places pour une compétition par un club donné.
+    Vue pour la réservation de places pour une compétition par un club donné.
     Vérifie si la compétition et le club sont valides, puis vérifie si le club a suffisamment
     de points pour acheter des places et si le nb de places demandées est positif.
     Si le club a suffisamment de points, les places sont réservées et les points du club et les
-    places de la compétition sont mis à jour.
+    places de la compétition sont mis à jour et les donnees sont enregistree.
+    Verifie qu'un club ne reserve pas plus de 12 places par competition.
     """
     clubs, competitions = load_data()
 
@@ -188,6 +190,7 @@ def purchase_places():
 @app.route("/logout")
 def logout():
     """
+    Vue pour la page Logout
     Déconnecte l'utilisateur et redirige vers la page d'accueil.
     """
 
