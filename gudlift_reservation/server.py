@@ -1,8 +1,6 @@
-from flask import (Flask, abort, flash, redirect, render_template, request,
-                   url_for)
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
-from .json_handler import (load_clubs, load_competitions, save_clubs,
-                           save_competitions)
+from .json_handler import load_clubs, load_competitions, save_clubs, save_competitions
 from .utils import verif_date_in_past
 
 app = Flask(__name__)
@@ -81,13 +79,9 @@ def book(competition, club):
     # Vérifie si la date de la compétition est déjà passée
     if verif_date_in_past(found_competition["date"]):
         flash("Competition date has already passed", "error")
-        return render_template(
-            welcome_template, club=found_club, competitions=competitions
-        )
+        return render_template(welcome_template, club=found_club, competitions=competitions)
 
-    return render_template(
-        "booking.html", club=found_club, competition=found_competition
-    )
+    return render_template("booking.html", club=found_club, competition=found_competition)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
@@ -103,9 +97,7 @@ def purchase_places():
     clubs, competitions = load_data()
 
     try:
-        competition = next(
-            c for c in competitions if c["name"] == request.form["competition"]
-        )
+        competition = next(c for c in competitions if c["name"] == request.form["competition"])
     except StopIteration:
         abort(400, "Invalid competition")
     try:
@@ -116,33 +108,23 @@ def purchase_places():
     # Vérifie si la date de la compétition est déjà passée
     if verif_date_in_past(competition["date"]):
         flash("Competition date has already passed", "error")
-        return redirect(
-            url_for("book", competition=competition["name"], club=club["name"])
-        )
+        return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     try:
         places_required = int(request.form["places"])
         if places_required <= 0:
             flash("Number of places required must be positive", "error")
-            return redirect(
-                url_for("book", competition=competition["name"], club=club["name"])
-            )
+            return redirect(url_for("book", competition=competition["name"], club=club["name"]))
         elif places_required > 12:
             flash("use no more than 12 places per competition", "error")
-            return redirect(
-                url_for("book", competition=competition["name"], club=club["name"])
-            )
+            return redirect(url_for("book", competition=competition["name"], club=club["name"]))
         elif places_required > competition["numberOfPlaces"]:
             flash("insufficient places in the competition", "error")
-            return redirect(
-                url_for("book", competition=competition["name"], club=club["name"])
-            )
+            return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     except ValueError:
         flash("Invalid number", "error")
-        return redirect(
-            url_for("book", competition=competition["name"], club=club["name"])
-        )
+        return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     if places_required <= club["points"]:
 
@@ -180,9 +162,7 @@ def purchase_places():
         flash("Great-booking complete!")
     else:
         flash("insufficient number of points", "error")
-        return redirect(
-            url_for("book", competition=competition["name"], club=club["name"])
-        )
+        return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     return render_template(welcome_template, club=club, competitions=competitions)
 
