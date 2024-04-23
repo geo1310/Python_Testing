@@ -2,13 +2,13 @@ from locust import HttpUser, task, between
 
 
 class PerfTest(HttpUser):
-    wait_time = between(1, 5)  # Temps d'attente entre les requêtes en secondes
+    # wait_time = between(1, 3)
 
     @task
     def index(self):
         self.client.get("/")
 
-    @task()
+    @task
     def login(self):
         self.client.get("/login")
 

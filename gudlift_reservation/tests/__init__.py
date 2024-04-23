@@ -1,5 +1,10 @@
 from gudlift_reservation import app
-from gudlift_reservation.json_handler import load_clubs, load_competitions, save_clubs, save_competitions
+from gudlift_reservation.json_handler import (
+    load_clubs,
+    load_competitions,
+    save_clubs,
+    save_competitions,
+)
 
 
 class TestSetup:

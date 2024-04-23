@@ -166,4 +166,4 @@ class TestServerRoutes(TestSetup):
         """
         response = self.client.get("/logout", follow_redirects=True)
         assert response.status_code == 200
-        assert b"Please enter your secretary email to continue" in response.data
+        assert b"Welcome to the GUDLFT Home page !" in response.data

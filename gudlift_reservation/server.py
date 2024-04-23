@@ -174,4 +174,4 @@ def logout():
     Déconnecte l'utilisateur et redirige vers la page d'accueil.
     """
 
-    return redirect(url_for("login"))
+    return redirect(url_for("index"))
