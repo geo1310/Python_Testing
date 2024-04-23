@@ -1,5 +1,4 @@
-from flask import (Flask, abort, flash, redirect, render_template, request,
-                   url_for)
+from flask import Flask, flash, redirect, render_template, request, url_for
 
 from .json_handler import (load_clubs, load_competitions, save_clubs,
                            save_competitions)
@@ -11,6 +10,9 @@ app.config.from_object("gudlift_reservation.config")
 
 
 def load_data():
+    '''
+    Charge et retourne les clubs et les compétitions
+    '''
     competitions = load_competitions()
     clubs = load_clubs()
     return clubs, competitions
@@ -94,24 +96,33 @@ def purchase_places():
     form = request.form
 
     # validation du formulaire de reservation
-    result_valid_form = valid_form_purchase_places(clubs, competitions, form)
-    # verifie si la validation renvoie les données ou une erreur.
-    if isinstance(result_valid_form, tuple):
-        club, competition, places_required = result_valid_form
+    valid_form, response_form = valid_form_purchase_places(clubs, competitions, form)
+    club = response_form[0]
+    competition = response_form[1]
+    if valid_form:
+        places_required = response_form[2]
     else:
-        return result_valid_form
+        flash(response_form[2], response_form[3])
+        return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     # validation de la reservation des places dans une competition
     result_reserv_places = reserv_places_competition(club, competition, places_required)
     # si la reservation s'est bien passée on enregistre les donnees
-    if not result_reserv_places:
+    if result_reserv_places:
         competition["numberOfPlaces"] -= places_required
         club["points"] -= places_required
         save_clubs(clubs)
         save_competitions(competitions)
         flash("Great-booking complete!")
     else:
-        return result_reserv_places
+        flash("use no more than 12 places per competition", "error")
+        return redirect(
+            url_for(
+                "book",
+                competition=competition["name"],
+                club=club["name"],
+            )
+        )
 
     return render_template(welcome_template, club=club, competitions=competitions)
 

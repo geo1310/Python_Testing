@@ -18,9 +18,7 @@
             "name": "Comp\u00e9tition exemple",
             "date": "2030-10-22 13:30:00",
             "numberOfPlaces": 15,
-            "reserved_places": [
-                
-            ]
+            "reserved_places": []
         }
     ]
 }

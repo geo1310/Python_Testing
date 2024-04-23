@@ -4,6 +4,8 @@ import pytest
 
 from gudlift_reservation.json_handler import (load_clubs, load_competitions,
                                               save_competitions)
+from gudlift_reservation.utils import (reserv_places_competition,
+                                       valid_club_and_competition)
 
 from . import TestSetup
 
@@ -65,47 +67,6 @@ class TestCalculation(TestSetup):
 
             assert club_points_after == expected_points
             assert club_points_after >= 0
-
-    @pytest.mark.parametrize(
-        "club_name, competition_name, places, expected_value",
-        [
-            (  # donnees valides
-                "Club_test",
-                "Competition_test_2",
-                5,
-                "Great-booking complete!",
-            ),
-            (  # nombre de places > 12
-                "Club_test",
-                "Competition_test_2",
-                13,
-                "use no more than 12 places per competition",
-            ),
-        ],
-    )
-    def test_competition_reserved_places(self, club_name, competition_name, places, expected_value):
-        """
-        Verifie la réservation des places dans une compétition
-        Les places reservées doivent etre enregistrées dans le champ reserved_places de la compétition.
-        Le nombre de places réservées dans ne doit pas dépasser 12 par competition.
-        """
-
-        rv = self.client.post(
-            "/purchasePlaces",
-            data={"competition": competition_name, "club": club_name, "places": places},
-            follow_redirects=True,
-        )
-
-        # verification des places reservées par le club dans reserved_places de la competition
-        self.competitions = load_competitions()
-        self.competition = next(comp for comp in self.competitions if comp["name"] == competition_name)
-        if "Great-booking complete!" in expected_value:
-            reserved_places = self.competition["reserved_places"][0]["reserved_places"]
-            assert reserved_places == places
-            assert reserved_places <= 12
-
-        assert rv.status_code == 200
-        assert expected_value.encode("utf-8") in rv.data
 
     @pytest.mark.parametrize(
         "club_name, competition_name, expected_value",
@@ -186,3 +147,33 @@ class TestCalculation(TestSetup):
 
         assert rv.status_code == 200
         assert expected_value.encode("utf-8") in rv.data
+
+    @pytest.mark.parametrize(
+        "club_name, competition_name, places",
+        [
+            (  # nombre de places à valider deux fois
+                "Club_test",
+                "Competition_test",
+                7,
+            ),
+        ],
+    )
+    def test_reserved_places_competition(self, club_name, competition_name, places):
+        """
+        Vérifie que le nombre de places réservées par un club ne peut pas dépasser 12
+        par compétition dans reserved_places de la compétition.
+        """
+
+        found_club, found_competition = valid_club_and_competition(
+            club_name, self.clubs, competition_name, self.competitions
+        )
+
+        result = reserv_places_competition(found_club, found_competition, places)
+        assert result == True
+
+        reserved_places = found_competition["reserved_places"][0]["reserved_places"]
+        assert reserved_places == places
+        assert reserved_places <= 12
+
+        result = reserv_places_competition(found_club, found_competition, places)
+        assert result == False
