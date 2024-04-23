@@ -2,8 +2,11 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from gudlift_reservation.json_handler import (load_clubs, load_competitions,
-                                              save_competitions)
+from gudlift_reservation.json_handler import (
+    load_clubs,
+    load_competitions,
+    save_competitions,
+)
 
 from . import TestSetup
 
@@ -36,9 +39,7 @@ class TestCalculation(TestSetup):
             ),
         ],
     )
-    def test_club_purchase_places_calculation(
-        self, club_name, competition_name, places, expected_value
-    ):
+    def test_club_purchase_places_calculation(self, club_name, competition_name, places, expected_value):
         """
         Verifie l'utilisation des points d'un club.
         Le nombre de points demandés doit etre positif.
@@ -85,9 +86,7 @@ class TestCalculation(TestSetup):
             ),
         ],
     )
-    def test_competition_reserved_places(
-        self, club_name, competition_name, places, expected_value
-    ):
+    def test_competition_reserved_places(self, club_name, competition_name, places, expected_value):
         """
         Verifie la réservation des places dans une compétition
         Les places reservées doivent etre enregistrées dans le champ reserved_places de la compétition.
@@ -102,9 +101,7 @@ class TestCalculation(TestSetup):
 
         # verification des places reservées par le club dans reserved_places de la competition
         self.competitions = load_competitions()
-        self.competition = next(
-            comp for comp in self.competitions if comp["name"] == competition_name
-        )
+        self.competition = next(comp for comp in self.competitions if comp["name"] == competition_name)
         if "Great-booking complete!" in expected_value:
             reserved_places = self.competition["reserved_places"][0]["reserved_places"]
             assert reserved_places == places
@@ -119,16 +116,12 @@ class TestCalculation(TestSetup):
             ("Club_test", "Competition_test", "Competition date has already passed"),
         ],
     )
-    def test_book_date_competition_not_be_in_past(
-        self, club_name, competition_name, expected_value
-    ):
+    def test_book_date_competition_not_be_in_past(self, club_name, competition_name, expected_value):
         """
         Vérifie qu'on ne peut pas réserver de places dans une compétition deja passée.
         Dans la méthode GET de de la route de réservation book
         """
-        self.competition = next(
-            comp for comp in self.competitions if comp["name"] == competition_name
-        )
+        self.competition = next(comp for comp in self.competitions if comp["name"] == competition_name)
 
         # modification de la date de la competition
         date_test = datetime.now() - timedelta(days=50)
@@ -153,9 +146,7 @@ class TestCalculation(TestSetup):
         Vérifie qu'on ne peut pas réserver de places dans une compétition deja passée.
         Dans la méthode POST de de la route purchase_places
         """
-        self.competition = next(
-            comp for comp in self.competitions if comp["name"] == competition_name
-        )
+        self.competition = next(comp for comp in self.competitions if comp["name"] == competition_name)
 
         # modification de la date de la competition
         date_test = datetime.now() - timedelta(days=50)
@@ -184,9 +175,7 @@ class TestCalculation(TestSetup):
             ),
         ],
     )
-    def test_competition_available_places(
-        self, club_name, competition_name, places, expected_value
-    ):
+    def test_competition_available_places(self, club_name, competition_name, places, expected_value):
         """
         Verifie si le nombre de places dans une competition est suffisant.
         Il ne peut pas etre négatif.

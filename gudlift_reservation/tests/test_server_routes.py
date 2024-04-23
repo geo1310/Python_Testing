@@ -45,9 +45,7 @@ class TestServerRoutes(TestSetup):
         Envoie une requête POST avec une adresse e-mail valide, non valide et sans email.
         et vérifie le code de statut de la réponse 200 et un message spécifique.
         """
-        rv = self.client.post(
-            "/showSummary", data=dict(email=email), follow_redirects=True
-        )
+        rv = self.client.post("/showSummary", data=dict(email=email), follow_redirects=True)
 
         assert rv.status_code == 200
         assert expected_value.encode("utf-8") in rv.data
@@ -145,9 +143,7 @@ class TestServerRoutes(TestSetup):
             ),
         ],
     )
-    def test_purchase_places_route(
-        self, club, competition, places, expected_value, status_code
-    ):
+    def test_purchase_places_route(self, club, competition, places, expected_value, status_code):
         """
         Test de la route "/purchasePlaces".
         Envoie une requête POST avec avec des données valides et non valides
@@ -170,4 +166,4 @@ class TestServerRoutes(TestSetup):
         """
         response = self.client.get("/logout", follow_redirects=True)
         assert response.status_code == 200
-        assert b"Please enter your secretary email to continue" in response.data
+        assert b"Welcome to the GUDLFT Home page !" in response.data
