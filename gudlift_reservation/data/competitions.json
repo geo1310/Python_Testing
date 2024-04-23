@@ -1,1 +1,26 @@
-{"competitions": [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": 5, "reserved_places": []}, {"name": "Fall Classic", "date": "2030-10-22 13:30:00", "numberOfPlaces": 2, "reserved_places": [{"club_name": "Simply pytestLift", "reserved_places": 7}, {"club_name": "Iron Temple", "reserved_places": 5}, {"club_name": "She Lifts", "reserved_places": 1}]}, {"name": "Comp\u00e9tition exemple", "date": "2030-10-22 13:30:00", "numberOfPlaces": 0, "reserved_places": [{"club_name": "Simply pytestLift", "reserved_places": 2}, {"club_name": "Iron Temple", "reserved_places": 3}]}]}
+{
+    "competitions": [
+        {
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": 5,
+            "reserved_places": []
+        },
+        {
+            "name": "Fall Classic",
+            "date": "2030-10-22 13:30:00",
+            "numberOfPlaces": 15,
+            "reserved_places": [
+                
+            ]
+        },
+        {
+            "name": "Comp\u00e9tition exemple",
+            "date": "2030-10-22 13:30:00",
+            "numberOfPlaces": 15,
+            "reserved_places": [
+                
+            ]
+        }
+    ]
+}
