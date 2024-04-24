@@ -16,6 +16,7 @@ class TestSetup:
         Ajoute les données de tests clubs et competitions
         Cree une sauvegarde des données initiales.
         """
+        app.testing = True
         cls.client = app.test_client()
         cls.clubs = load_clubs()
         cls.competitions = load_competitions()

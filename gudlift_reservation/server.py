@@ -60,6 +60,8 @@ def show_summary():
         flash(f"Club with this email {email} not found", "error")
         return redirect(url_for("login"))
 
+    session["user_id"] = email
+
     return render_template(welcome_template, club=club, competitions=competitions)
 
 

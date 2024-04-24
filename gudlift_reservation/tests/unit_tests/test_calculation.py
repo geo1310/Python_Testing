@@ -7,7 +7,7 @@ from gudlift_reservation.json_handler import (load_clubs, load_competitions,
 from gudlift_reservation.utils import (reserv_places_competition,
                                        valid_club_and_competition)
 
-from . import TestSetup
+from .. import TestSetup
 
 
 class TestCalculation(TestSetup):
