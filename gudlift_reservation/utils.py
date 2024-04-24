@@ -53,18 +53,14 @@ def reserv_places_competition(club, competition, places_required):
         "reserved_places": places_required,
     }
 
-    if not competition["reserved_places"]:
-        competition["reserved_places"].append(reserved_places_entry)
+    for entry in competition["reserved_places"]:
+        if entry["club_name"] == club["name"]:
+            if entry["reserved_places"] + places_required > 12:
+                return False
+            entry["reserved_places"] += places_required
+            break
     else:
-        for entry in competition["reserved_places"]:
-
-            if entry["club_name"] == club["name"]:
-                if entry["reserved_places"] + places_required > 12:
-                    return False
-                entry["reserved_places"] += places_required
-                break
-        else:
-            competition["reserved_places"].append(reserved_places_entry)
+        competition["reserved_places"].append(reserved_places_entry)
     return True
 
 
@@ -75,27 +71,33 @@ def valid_form_purchase_places(clubs, competitions, form):
     Verifie si la date de competition n'est pas passée.
     Verifie si le nombre de places demandées est valide.
 
-    Si aucunes erreurs :Renvoie True et une liste avec le club, la competition et les places demandées.
-    Si erreurs trouvées :Renvoie False et une liste avec le club, la competition et le message d'erreur
+    Si aucunes erreurs :Renvoie True et un dict contenant le club, la competition et les places demandées.
+    Si erreurs trouvées :Renvoie False et un dict contenant le club, la competition et le message d'erreur.
     """
     # validation du club et de la competition
     club, competition = valid_club_and_competition(form["club"], clubs, form["competition"], competitions)
+    data = {"club": club, "competition": competition, "places_required": 0, "error_message": "", "error_type": "error"}
 
     # Vérifie si la date de la compétition est déjà passée
     if verif_date_in_past(competition["date"]):
-        return False, [club, competition, "Competition date has already passed", "error"]
+        data["error_message"] = "Competition date has already passed"
+        return False, data
 
     try:
         places_required = int(request.form["places"])
         if places_required <= 0:
-            return False, [club, competition, "Number of places required must be positive", "error"]
-
+            data["error_message"] = "Number of places required must be positive"
+            return False, data
         elif places_required > competition["numberOfPlaces"]:
-            return False, [club, competition, "insufficient places in the competition", "error"]
+            data["error_message"] = "insufficient places in the competition"
+            return False, data
         elif places_required > club["points"]:
-            return False, [club, competition, "insufficient number of points", "error"]
+            data["error_message"] = "insufficient number of points"
+            return False, data
 
-        return True, [club, competition, places_required]
+        data["places_required"] = places_required
+        return True, data
 
     except ValueError:
-        return False, [club, competition, "Invalid number", "error"]
+        data["error_message"] = "Invalid number"
+        return False, data

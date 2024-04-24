@@ -4,6 +4,9 @@ from gudlift_reservation.json_handler import (load_clubs, load_competitions,
 
 
 class TestSetup:
+    """
+    Configuration des tests,  création des données de tests et nettoyage aprés les tests.
+    """
 
     @classmethod
     def setup_class(cls):

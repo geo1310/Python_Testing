@@ -1,4 +1,5 @@
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import (Flask, flash, redirect, render_template, request, session,
+                   url_for)
 
 from .json_handler import (load_clubs, load_competitions, save_clubs,
                            save_competitions)
@@ -10,9 +11,9 @@ app.config.from_object("gudlift_reservation.config")
 
 
 def load_data():
-    '''
+    """
     Charge et retourne les clubs et les compétitions
-    '''
+    """
     competitions = load_competitions()
     clubs = load_clubs()
     return clubs, competitions
@@ -89,20 +90,20 @@ def purchase_places():
     Vérifie si la compétition et le club sont valides, puis vérifie si le club a suffisamment
     de points pour acheter des places et si le nb de places demandées est positif.
     Si le club a suffisamment de points, les places sont réservées et les points du club et les
-    places de la compétition sont mis à jour et les donnees sont enregistree.
-    Verifie qu'un club ne reserve pas plus de 12 places par competition.
+    places de la compétition sont mis à jour et les donnees sont enregistrées.
+    Vérifie qu'un club ne réserve pas plus de 12 places par compétition.
     """
     clubs, competitions = load_data()
     form = request.form
 
     # validation du formulaire de reservation
-    valid_form, response_form = valid_form_purchase_places(clubs, competitions, form)
-    club = response_form[0]
-    competition = response_form[1]
+    valid_form, data = valid_form_purchase_places(clubs, competitions, form)
+    club = data["club"]
+    competition = data["competition"]
     if valid_form:
-        places_required = response_form[2]
+        places_required = data["places_required"]
     else:
-        flash(response_form[2], response_form[3])
+        flash(data["error_message"], data["error_type"])
         return redirect(url_for("book", competition=competition["name"], club=club["name"]))
 
     # validation de la reservation des places dans une competition
@@ -133,5 +134,5 @@ def logout():
     Vue pour la page Logout
     Déconnecte l'utilisateur et redirige vers la page d'accueil.
     """
-
+    session.clear()
     return redirect(url_for("index"))

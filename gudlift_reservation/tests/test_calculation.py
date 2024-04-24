@@ -36,6 +36,12 @@ class TestCalculation(TestSetup):
                 -100,
                 "Number of places required must be positive",
             ),
+            (  # nombre de places superieures à 12
+                "Club_test",
+                "Competition_test_2",
+                13,
+                "use no more than 12 places per competition",
+            ),
         ],
     )
     def test_club_purchase_places_calculation(self, club_name, competition_name, places, expected_value):
@@ -151,15 +157,16 @@ class TestCalculation(TestSetup):
     @pytest.mark.parametrize(
         "club_name, competition_name, places",
         [
-            (  # nombre de places à valider deux fois
+            (  # nombre de places à valider 3 fois
                 "Club_test",
                 "Competition_test",
-                7,
+                5,
             ),
         ],
     )
     def test_reserved_places_competition(self, club_name, competition_name, places):
         """
+        Test de la fonction reserved_places_competition.
         Vérifie que le nombre de places réservées par un club ne peut pas dépasser 12
         par compétition dans reserved_places de la compétition.
         """
@@ -168,12 +175,26 @@ class TestCalculation(TestSetup):
             club_name, self.clubs, competition_name, self.competitions
         )
 
+        # 1-demande initiale de n places
         result = reserv_places_competition(found_club, found_competition, places)
         assert result == True
+        assert found_competition["reserved_places"][0]["club_name"] == found_club["name"]
+        reserved_places_1 = found_competition["reserved_places"][0]["reserved_places"]
+        assert reserved_places_1 <= 12
+        assert reserved_places_1 == places
 
-        reserved_places = found_competition["reserved_places"][0]["reserved_places"]
-        assert reserved_places == places
-        assert reserved_places <= 12
+        # 2-demande de n places
+        result = reserv_places_competition(found_club, found_competition, places)
+        assert result == True
+        reserved_places_2 = found_competition["reserved_places"][0]["reserved_places"]
+        assert reserved_places_2 <= 12
+        assert reserved_places_2 == reserved_places_1 + places
 
+        # 3-demande de n places ( résultat > 12 )
         result = reserv_places_competition(found_club, found_competition, places)
         assert result == False
+
+        # test avec un autre club
+        found_club, _ = valid_club_and_competition("Club_test_2", self.clubs, competition_name, self.competitions)
+        result = reserv_places_competition(found_club, found_competition, places)
+        assert result == True
