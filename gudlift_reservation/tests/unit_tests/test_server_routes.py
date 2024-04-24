@@ -1,6 +1,6 @@
 import pytest
 
-from . import TestSetup
+from .. import TestSetup
 
 
 class TestServerRoutes(TestSetup):
