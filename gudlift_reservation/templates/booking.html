@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icn/favicon.ico') }}">
+        <title>Booking for {{competition['name']}} || GUDLFT</title>
+    </head>
+    <body>
+        <h2>{{competition['name']}}</h2>
+        Places available: {{competition['numberOfPlaces']}}
+        {%if competition['reserved_places']%}
+            <ul>
+                {%for entry in competition['reserved_places']%}
+                    <li>Club : {{entry['club_name']}} - Reserved places : {{entry['reserved_places']}}
+                {%endfor%}
+            </ul>
+        {%endif%}
+        <hr />
+        <div>
+            <p>Your club : {{club['name']}}</p>
+            <p> You have : {{club['points']}} points available.</p>
+        </div>
+
+        <form action="/purchasePlaces" method="post">
+            <input type="hidden" name="club" value="{{club['name']}}">
+            <input type="hidden" name="competition" value="{{competition['name']}}">
+            <label for="places">How many places?</label><input type="number" name="places" id=""/>
+            <button type="submit">Book</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/showSummary" method="post">
+            <input type="hidden" name="email" value="{{club['email']}}">
+            <button type="submit">Return Summary</button>
+        </form>
+    </body>
+</html>

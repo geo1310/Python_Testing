@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "gudlift-reservation"
+version = "0.1.0"
+description = ""
+authors = ["geo1310 <gbriche59@yahoo.fr>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Flask = "^3.0.3"
+pytest = "^8.1.1"
+pytest-html = "^4.1.1"
+coverage = "^7.4.4"
+pytest-cov = "^5.0.0"
+locust = "^2.26.0"
+black = "^24.4.0"
+isort = "^5.13.2"
+pycln = "^2.4.0"
+djhtml = "^3.0.6"
+flake8= "^7.0.0"
+Flake8-pyproject= "^1.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.locust]
+locustfile = "gudlift_reservation/tests/performance_tests/locustfile.py"
+host = "http://localhost:5000"
+users = 6
+spawn-rate = 1
+
+[tool.pytest]
+testpaths = "gudlift_reservation/tests"
+
+[tool.coverage.run]
+branch = true
+omit = ["gudlift_reservation/tests/*", "__*", "config.py"]
+
+[tool.flake8]
+max-line-length = 119
+exclude = "env/, docs/"
+extend-ignore = [
+    # PEP 8 recommends to treat : in slices as a binary operator with the lowest priority, and to leave an equal
+    # amount of space on either side, except if a parameter is omitted (e.g. ham[1 + 1 :]).
+    # This behaviour may raise E203 whitespace before ':' warnings in style guide enforcement tools like Flake8.
+    # Since E203 is not PEP 8 compliant, we tell Flake8 to ignore this warning.
+    # https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#slices    
+    "E203"
+]
+
+[tool.black]
+line-length = 119
+
+
