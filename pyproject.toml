@@ -27,7 +27,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.locust]
 locustfile = "gudlift_reservation/tests/performance_tests/locustfile.py"
-host = "http://localhost:5000"
+host = "http://127.0.0.1:5000"
 users = 6
 spawn-rate = 1
 
