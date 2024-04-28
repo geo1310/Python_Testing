@@ -77,12 +77,25 @@ def book(competition, club):
     # validation du club et de la competition
     found_club, found_competition = valid_club_and_competition(club, clubs, competition, competitions)
 
+    # calcul du nombre max de places reservables pour l'interface utilisateur
+    if found_competition["reserved_places"]:
+        club_entry = next((entry for entry in found_competition["reserved_places"] if entry["club_name"] == found_club["name"]), None)
+        if club_entry:
+            max_reserved_places = 12 - club_entry['reserved_places']
+        else:
+            max_reserved_places = 12
+    else:
+        max_reserved_places = 12
+        
+    max_places = min(found_club["points"], found_competition["numberOfPlaces"], max_reserved_places)
+
+
     # Vérifie si la date de la compétition est déjà passée
     if verif_date_in_past(found_competition["date"]):
         flash("Competition date has already passed", "error")
         return render_template(welcome_template, club=found_club, competitions=competitions)
 
-    return render_template("booking.html", club=found_club, competition=found_competition)
+    return render_template("booking.html", club=found_club, competition=found_competition, max_places=max_places)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
